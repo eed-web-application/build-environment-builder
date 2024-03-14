@@ -1,0 +1,6 @@
+base_image: "ubuntu:latest"
+commands:
+  - apt-get update
+  - apt-get install -y nginx
+  - echo 'Hello, World!' > /var/www/html/index.html
+  - ls -la /var/www/html
