@@ -5,7 +5,9 @@ version: '3.8'
 #    null
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/go:1-1.22-bookworm
+    build:
+        context: .
+        dockerfile: Dockerfile
 
     # Security Opt and cap_add allow for C++ based debuggers to work. 
     # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
@@ -27,13 +29,8 @@ services:
     # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
-  epics_pva:
-    image: ghcr.io/bisegni/epics-base-docker-image:main
-    volumes:
-      - ../tests/epics-test.db:/db/softioc.db
-
   cbs:
-    image: ghcr.io/eed-web-application/core-work-management:latest
+    image: ghcr.io/eed-web-application/core-build-system:latest
     restart: on-failure
     pull_policy: always
     environment:
