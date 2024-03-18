@@ -1,6 +1,6 @@
 module github.com/eed-web-application/build-environment-builder
 
-go 1.22.1
+go 1.22
 
 require (
 	github.com/docker/docker v25.0.4+incompatible

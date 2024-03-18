@@ -1,0 +1,62 @@
+version: '3.8'
+
+#volumes:
+#  redis-data:
+#    null
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/go:1-1.22-bookworm
+
+    # Security Opt and cap_add allow for C++ based debuggers to work. 
+    # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
+    #     security_opt:
+    #       - seccomp:unconfined
+    #     cap_add:
+    #       - SYS_PTRACE
+
+    volumes:
+      - ..:/workspace:cached
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+    # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    #network_mode: service:redis
+    # Uncomment the next line to use a non-root user for all processes.
+    # user: vscode
+
+    # Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  epics_pva:
+    image: ghcr.io/bisegni/epics-base-docker-image:main
+    volumes:
+      - ../tests/epics-test.db:/db/softioc.db
+
+  cbs:
+    image: ghcr.io/eed-web-application/core-work-management:latest
+    restart: on-failure
+    pull_policy: always
+    environment:
+      - CBS_MONGODB_URI=mongodb://cbs:cbs@mongodb-primary:27017/cbs?authSource=cbs
+      - CBS_ADMIN_MONGODB_URI=mongodb://admin:admin@mongodb-primary:27017/?authSource=admin
+      - CBS_ROOT_USERS=user1@slac.stanford.edu,service@internal.cwm.slac.app$
+      - WAIT_LOGGER_LEVEL=debug
+      - WAIT_TIMEOUT=90
+      - WAIT_HOSTS=mongodb-primary:27017
+      - SPRING_PROFILES_ACTIVE=test,init-demo-database,manage-root-user-token-auth
+      - CBS_ROOT_AUTHENTICATION_TOKEN_JSON=[{"name":"root-token-1","expiration":"2024-12-31"}]
+    ports:
+      - "8081:8080"
+
+  mongodb-primary:
+    image: ghcr.io/zcube/bitnami-compat/mongodb:6.0.5
+    restart: on-failure
+    environment:
+      - MONGODB_ROOT_USER=admin
+      - MONGODB_ROOT_PASSWORD=admin
+      - BITNAMI_DEBUG=true
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-primary
+      - MONGODB_REPLICA_SET_KEY=replicasetkey123
+    ports:
+      - "27017:27017"
