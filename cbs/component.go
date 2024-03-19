@@ -10,24 +10,24 @@ import (
 
 // Replace "path/to/cbsapi" with the actual import path of the "cbsapi" package
 
-func getSecurity() (*securityprovider.SecurityProviderApiKey, error) {
+func getClient(host string) (*ClientWithResponses, error) {
 	apiKeyProvider, apiKeyProviderErr := securityprovider.NewSecurityProviderApiKey("header", "X-API-Key", "MY_API_KEY")
 	if apiKeyProviderErr != nil {
 		logrus.Error(fmt.Printf("error setting the security provider: %v", apiKeyProviderErr))
 		return nil, apiKeyProviderErr
 	}
-	return apiKeyProvider, nil
+	client, clientErr := NewClientWithResponses(host, WithRequestEditorFn(apiKeyProvider.Intercept))
+	if clientErr != nil {
+		logrus.Error(fmt.Printf("error creating client: %v", clientErr))
+		return nil, clientErr
+	}
+	return client, nil
 }
 
 // FindAllComponent is the function to get all the components
-func FindAllComponent() (*[]ComponentDTO, error) {
-	secProvider, errorSecProvider := getSecurity()
-	if errorSecProvider != nil {
-		return nil, errorSecProvider
-	}
-	client, clientErr := NewClientWithResponses("http://cbs:8080", WithRequestEditorFn(secProvider.Intercept))
+func FindAllComponent(host string) (*[]ComponentDTO, error) {
+	client, clientErr := getClient(host)
 	if clientErr != nil {
-		logrus.Error(fmt.Printf("error creating client: %v", clientErr))
 		return nil, clientErr
 	}
 
@@ -40,14 +40,9 @@ func FindAllComponent() (*[]ComponentDTO, error) {
 }
 
 // CreateNewComponent create a new component  and return the id
-func CreateNewComponent(component NewComponentDTO) (*string, error) {
-	secProvider, errorSecProvider := getSecurity()
-	if errorSecProvider != nil {
-		return nil, errorSecProvider
-	}
-	client, clientErr := NewClientWithResponses("http://cbs:8080", WithRequestEditorFn(secProvider.Intercept))
+func CreateNewComponent(host string, component NewComponentDTO) (*string, error) {
+	client, clientErr := getClient(host)
 	if clientErr != nil {
-		logrus.Error(fmt.Printf("error creating client: %v", clientErr))
 		return nil, clientErr
 	}
 

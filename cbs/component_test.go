@@ -9,6 +9,7 @@ import (
 
 func TestCreateComponent(t *testing.T) {
 	id, err := cbs.CreateNewComponent(
+		"http://cbs:8080",
 		cbs.NewComponentDTO{
 			Name:    "test",
 			Url:     "component url",
@@ -17,7 +18,7 @@ func TestCreateComponent(t *testing.T) {
 	)
 	assert.NoError(t, err)
 	assert.NotNil(t, id, "Id should be valorized")
-	found_component, err := cbs.FindAllComponent()
+	found_component, err := cbs.FindAllComponent("http://cbs:8080")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(*found_component), "The length of the component array should be 1")
 }
