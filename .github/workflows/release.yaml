@@ -67,26 +67,28 @@ jobs:
     - name: Build binary for Linux
       run: |
         GOOS=linux GOARCH=amd64 go build -o cbs-linux-amd64
+        tar -czvf cbs-linux-amd64.tar.gz -C cbs-linux-amd64 .
       env:
         GO111MODULE: on
 
     - name: Build binary for macOS
       run: |
         GOOS=darwin GOARCH=amd64 go build -o cbs-darwin-amd64
+        tar -czvf cbs-darwin-amd64.tar.gz -C cbs-darwin-amd64 .
       env:
         GO111MODULE: on
 
     - name: Archive Linux binary
       uses: actions/upload-artifact@v3
       with:
-        name: cbs-linux-amd64
-        path: cbs-linux-amd64
+        name: cbs-darwin-amd64.tar.gz
+        path: cbs-darwin-amd64.tar.gz
 
     - name: Archive macOS binary
       uses: actions/upload-artifact@v3
       with:
-        name: cbs-darwin-amd64
-        path: cbs-darwin-amd64
+        name: cbs-linux-amd64.tar.gz
+        path: cbs-linux-amd64.tar.gz
 
   create-and-upload-release:
     needs: build
@@ -118,8 +120,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/cbs-linux-amd64
-            artifacts/cbs-darwin-amd64
+            artifacts/cbs-linux-amd64.tar.gz
+            artifacts/cbs-darwin-amd64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -128,8 +130,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            artifacts/cbs-linux-amd64
-            artifacts/cbs-darwin-amd64
+            artifacts/cbs-linux-amd64.tar.gz
+            artifacts/cbs-darwin-amd64.tar.gz
           tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
