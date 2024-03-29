@@ -45,17 +45,17 @@ func TestUpdateCommandTemplate(t *testing.T) {
 	id, err := cbs.CreateNewCommandTemplate(GetTestHost(), &commandTemplate)
 	assert.NoError(t, err)
 	assert.NotNil(t, id, "Id should be valorized")
-	cmd, err := cbs.FindCommandById(GetTestHost(), *id)
+	cmd_before, err := cbs.FindCommandById(GetTestHost(), *id)
 	assert.NoError(t, err)
-	assert.NotNil(t, cmd, "command should be valorized")
+	assert.NotNil(t, cmd_before, "command should be valorized")
 	// simulate user update
 	utility.Deserialize("command_template_update_test.yaml", &commandTemplateUpdated)
 	// update
 	err = cbs.UpdateCommandById(GetTestHost(), *id, &commandTemplateUpdated)
 	assert.NoError(t, err)
-	cmd, err = cbs.FindCommandById(GetTestHost(), *id)
+	cmd_after, err := cbs.FindCommandById(GetTestHost(), *id)
 	assert.NoError(t, err)
-	assert.NotNil(t, cmd, "command should be valorized")
-	assert.NotEqual(t, commandTemplateUpdated.Name, cmd.Name, "Name should be updated")
-	assert.NotEqual(t, commandTemplateUpdated.Description, cmd.Description, "Name should be updated")
+	assert.NotNil(t, cmd_after, "command should be valorized")
+	assert.NotEqual(t, cmd_before.Name, cmd_after.Name, "Name should be updated")
+	assert.NotEqual(t, cmd_before.Description, cmd_after.Description, "Name should be updated")
 }
