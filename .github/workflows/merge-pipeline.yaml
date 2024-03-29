@@ -39,8 +39,7 @@ jobs:
 
     - name: Test
       run: go test -v ./...
-      with:
-        env:
+      env:
           CBS_TEST_HOST: http://localhost:8081
 
     - name: Shutdown test backend
