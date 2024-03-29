@@ -39,6 +39,9 @@ jobs:
 
     - name: Test
       run: go test -v ./...
+      with:
+        env:
+          CBS_TEST_HOST: http://localhost:8081
 
     - name: Shutdown test backend
       if: steps.check_files.outputs.files_exists == 'true' &&  (success() || failure())
