@@ -123,7 +123,17 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Get release upload URL for existing release
+        if: env.RELEASE_EXISTS == 'true'
+        id: get_release
+        run: |
+          UPLOAD_URL=$(gh release view ${{ github.ref_name }} --json uploadUrl -q .uploadUrl)
+          echo "::set-output name=upload_url::$UPLOAD_URL"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Upload Linux binary to Release
+        if: env.RELEASE_EXISTS == 'false'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -134,11 +144,34 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload macOS binary to Release
+        if: env.RELEASE_EXISTS == 'false'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: cbs-darwin-amd64
+          asset_name: cbs-darwin-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload Linux binary to Release
+        if: env.RELEASE_EXISTS == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: cbs-linux-amd64
+          asset_name: cbs-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS binary to Release
+        if: env.RELEASE_EXISTS == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
           asset_path: cbs-darwin-amd64
           asset_name: cbs-darwin-amd64
           asset_content_type: application/octet-stream
