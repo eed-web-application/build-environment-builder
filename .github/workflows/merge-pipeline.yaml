@@ -38,9 +38,14 @@ jobs:
         sleep 5
 
     - name: Test
-      run: go test -v ./...
+      run: |
+        wget https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait_x86_64 -O wait
+        chmod a+x wait
+        ./wait
+        go test -v ./...
       env:
           CBS_TEST_HOST: http://localhost:8081
+           WAIT_HOSTS: localhost:8081
 
     - name: Shutdown test backend
       if: steps.check_files.outputs.files_exists == 'true' &&  (success() || failure())
