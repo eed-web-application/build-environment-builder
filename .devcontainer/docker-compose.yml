@@ -8,15 +8,14 @@ services:
     build:
         context: .
         dockerfile: Dockerfile
-    profiles:
-      - dev
     # Security Opt and cap_add allow for C++ based debuggers to work. 
     # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
     #     security_opt:
     #       - seccomp:unconfined
     #     cap_add:
     #       - SYS_PTRACE
-
+    profiles:
+      - builder
     volumes:
       - ..:/workspace:cached
 
@@ -45,6 +44,8 @@ services:
       - CBS_ROOT_AUTHENTICATION_TOKEN_JSON=[{"name":"root-token-1","expiration":"2024-12-31"}]
     ports:
       - "8081:8080"
+    profiles:
+      - pipeline
 
   mongodb-primary:
     image: ghcr.io/zcube/bitnami-compat/mongodb:6.0.5
@@ -58,3 +59,5 @@ services:
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
     ports:
       - "27017:27017"
+    profiles:
+      - pipeline

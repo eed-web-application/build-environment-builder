@@ -34,7 +34,7 @@ jobs:
     - name: Launch test backend
       if: steps.check_files.outputs.files_exists == 'true'
       run: |
-        docker compose -f .devcontainer/docker-compose.yml up -d
+        docker compose -f .devcontainer/docker-compose.yml --profile=pipeline up -d
         sleep 5
 
     - name: Test
