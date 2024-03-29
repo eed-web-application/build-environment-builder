@@ -96,8 +96,20 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
+      - name: Check if the release already exists
+        id: check_release
+        run: |
+          if gh release view ${{ github.ref_name }}; then
+            echo "Release already exists."
+            echo "RELEASE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Release does not exist."
+            echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
+          fi
+
       - name: Create Release
         id: create_release
+        if: env.RELEASE_EXISTS == 'false'
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
