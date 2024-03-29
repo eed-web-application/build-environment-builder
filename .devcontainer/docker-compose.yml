@@ -8,7 +8,8 @@ services:
     build:
         context: .
         dockerfile: Dockerfile
-
+    profiles:
+      - dev
     # Security Opt and cap_add allow for C++ based debuggers to work. 
     # See `runArgs`: https://github.com/Microsoft/vscode-docs/blob/main/docs/remote/devcontainerjson-reference.md
     #     security_opt:

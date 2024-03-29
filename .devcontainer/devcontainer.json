@@ -4,7 +4,11 @@
 	"name": "CoreBuildSystemDevEnvironment",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspace"
+	"workspaceFolder": "/workspace",
+	"remoteEnv": {
+		"COMPOSE_PROFILES": "dev"
+	}
+	
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
