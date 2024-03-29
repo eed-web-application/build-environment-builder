@@ -74,7 +74,7 @@ jobs:
     - name: Build binary for macOS
       run: |
         GOOS=darwin GOARCH=amd64 go build -o cbs-darwin-amd64
-        tar -czvf cbs-linux-amd64.tar.gz -C . cbs-darwin-amd64
+        tar -czvf cbs-darwin-amd64.tar.gz -C . cbs-darwin-amd64
       env:
         GO111MODULE: on
 
