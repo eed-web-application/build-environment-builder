@@ -10,52 +10,52 @@ import (
 
 func TestCreateNewCommandTemplate(t *testing.T) {
 	var commandTemplate cbs.NewCommandTemplateDTO
-	resetData("http://cbs:8080")
+	resetData(GetTestHost())
 	// Open the YAML file
 	utility.Deserialize("command_template_new_test.yaml", &commandTemplate)
 
 	// Use the parsed data
-	id, err := cbs.CreateNewCommandTemplate("http://cbs:8080", &commandTemplate)
+	id, err := cbs.CreateNewCommandTemplate(GetTestHost(), &commandTemplate)
 	assert.NoError(t, err)
 	assert.NotNil(t, id, "Id should be valorized")
 }
 
 func TestCreateDeleteCommandTemplate(t *testing.T) {
 	var commandTemplate cbs.NewCommandTemplateDTO
-	resetData("http://cbs:8080")
+	resetData(GetTestHost())
 	// Open the YAML file
 	utility.Deserialize("command_template_new_test.yaml", &commandTemplate)
 
 	// Use the parsed data
-	id, err := cbs.CreateNewCommandTemplate("http://cbs:8080", &commandTemplate)
+	id, err := cbs.CreateNewCommandTemplate(GetTestHost(), &commandTemplate)
 	assert.NoError(t, err)
 	assert.NotNil(t, id, "Id should be valorized")
-	err = cbs.DeleteCommandTemplate("http://cbs:8080", *id)
+	err = cbs.DeleteCommandTemplate(GetTestHost(), *id)
 	assert.NoError(t, err)
 }
 
 func TestUpdateCommandTemplate(t *testing.T) {
 	var commandTemplate cbs.NewCommandTemplateDTO
 	var commandTemplateUpdated cbs.UpdateCommandTemplateDTO
-	resetData("http://cbs:8080")
+	resetData(GetTestHost())
 	// Open the YAML file
 	utility.Deserialize("command_template_new_test.yaml", &commandTemplate)
 
 	// Use the parsed data
-	id, err := cbs.CreateNewCommandTemplate("http://cbs:8080", &commandTemplate)
+	id, err := cbs.CreateNewCommandTemplate(GetTestHost(), &commandTemplate)
 	assert.NoError(t, err)
 	assert.NotNil(t, id, "Id should be valorized")
-	cmd, err := cbs.FindCommandById("http://cbs:8080", *id)
+	cmd_before, err := cbs.FindCommandById(GetTestHost(), *id)
 	assert.NoError(t, err)
-	assert.NotNil(t, cmd, "command should be valorized")
+	assert.NotNil(t, cmd_before, "command should be valorized")
 	// simulate user update
 	utility.Deserialize("command_template_update_test.yaml", &commandTemplateUpdated)
 	// update
-	err = cbs.UpdateCommandById("http://cbs:8080", *id, &commandTemplateUpdated)
+	err = cbs.UpdateCommandById(GetTestHost(), *id, &commandTemplateUpdated)
 	assert.NoError(t, err)
-	cmd, err = cbs.FindCommandById("http://cbs:8080", *id)
+	cmd_after, err := cbs.FindCommandById(GetTestHost(), *id)
 	assert.NoError(t, err)
-	assert.NotNil(t, cmd, "command should be valorized")
-	assert.NotEqual(t, commandTemplateUpdated.Name, cmd.Name, "Name should be updated")
-	assert.NotEqual(t, commandTemplateUpdated.Description, cmd.Description, "Name should be updated")
+	assert.NotNil(t, cmd_after, "command should be valorized")
+	assert.NotEqual(t, cmd_before.Name, cmd_after.Name, "Name should be updated")
+	assert.NotEqual(t, cmd_before.Description, cmd_after.Description, "Name should be updated")
 }

@@ -1,0 +1,128 @@
+name: Go Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main
+
+jobs:
+  build-for-test:
+    name: Build for Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.22.1'  # Use the version of Go in your project
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Check for docker-compose.yml file
+      uses: andstor/file-existence-action@v2
+      id: check_files
+      with:
+        files: ".devcontainer/docker-compose.yml"
+        
+    - name: Launch test backend
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        docker compose -f .devcontainer/docker-compose.yml --profile=pipeline up -d
+        sleep 10
+
+    - name: Test
+      run: |
+        wget https://github.com/ufoscout/docker-compose-wait/releases/download/2.12.1/wait_x86_64 -O wait
+        chmod a+x wait
+        ./wait
+        go test -v ./...
+      env:
+          CBS_TEST_HOST: http://localhost:8081
+          WAIT_HOSTS: localhost:8081
+
+    - name: Shutdown test backend
+      if: steps.check_files.outputs.files_exists == 'true' &&  (success() || failure())
+      run: |
+        docker compose -f .devcontainer/docker-compose.yml logs
+        docker compose -f .devcontainer/docker-compose.yml down -v
+  build:
+    name: Build for Linux and macOS
+    needs: build-for-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.22.1' # Adjust to match your Go version
+
+    - name: Build binary for Linux
+      run: |
+        GOOS=linux GOARCH=amd64 go build -o cbs-linux-amd64 ./...
+      env:
+        GO111MODULE: on
+
+    - name: Build binary for macOS
+      run: |
+        GOOS=darwin GOARCH=amd64 go build -o cbs-darwin-amd64 ./...
+      env:
+        GO111MODULE: on
+
+    - name: Archive Linux binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: cbs-linux-amd64
+        path: cbs-linux-amd64
+
+    - name: Archive macOS binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: cbs-darwin-amd64
+        path: cbs-darwin-amd64
+
+  create-release:
+    name: Create and Upload Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Linux binary to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: myapp-linux-amd64
+          asset_name: myapp-linux-amd64
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS binary to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: myapp-darwin-amd64
+          asset_name: myapp-darwin-amd64
+          asset_content_type: application/octet-stream

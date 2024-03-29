@@ -2,10 +2,21 @@ package cbs_test
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/eed-web-application/build-environment-builder/cbs"
 )
+
+func GetTestHost() string {
+	host := "http://cbs:8080"
+	if envHost := os.Getenv("CBS_TEST_HOST"); envHost != "" {
+		fmt.Printf("Using host from environment variable: %s\n", envHost)
+		host = envHost
+	}
+	return host
+}
 
 func resetData(host string) {
 	client, clientErr := cbs.GetClient(host)
