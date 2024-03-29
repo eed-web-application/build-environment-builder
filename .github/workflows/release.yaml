@@ -100,7 +100,6 @@ jobs:
         with:
           path: artifacts
       - name: list artifacts
-        id: check_release
         run: |
           ls -la artifacts/
       - name: Determine if release exists
