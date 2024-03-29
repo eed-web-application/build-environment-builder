@@ -25,5 +25,23 @@ jobs:
     - name: Build
       run: go build -v ./...
 
+    - name: Check for docker-compose.yml file
+      uses: andstor/file-existence-action@v2
+      id: check_files
+      with:
+        files: ".devcontainer/docker-compose.yml"
+        
+    - name: Launch test backend
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: |
+        docker compose -f .devcontainer/docker-compose.yml up -d
+        sleep 5
+
     - name: Test
       run: go test -v ./...
+
+    - name: Shutdown test backend
+      if: steps.check_files.outputs.files_exists == 'true' &&  (success() || failure())
+      run: |
+        docker compose -f .devcontainer/docker-compose.yml logs
+        docker compose -f .devcontainer/docker-compose.yml down -v
