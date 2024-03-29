@@ -106,7 +106,9 @@ jobs:
             echo "Release does not exist."
             echo "RELEASE_EXISTS=false" >> $GITHUB_ENV
           fi
-
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Create Release
         id: create_release
         if: env.RELEASE_EXISTS == 'false'
