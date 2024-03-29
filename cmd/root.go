@@ -38,9 +38,10 @@ var RootFlags = &RootFlagsType{
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "eed build system",
-	Short: "EED build system - Command Line Tools.",
-	Long:  `EED build system long descirption`,
+	Use:          "eed build system",
+	Short:        "EED build system - Command Line Tools.",
+	Long:         `EED build system long descirption`,
+	SilenceUsage: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		v, _ := cmd.Flags().GetString("verbose")
 		v = strings.ToLower(v)

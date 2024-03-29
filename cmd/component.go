@@ -2,9 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"fmt"
 
-	"github.com/eed-web-application/build-environment-builder/cbs"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
@@ -40,8 +38,8 @@ var componentFindAllCmd = &cobra.Command{
 	Long:  `Reaturn all compoenet in the system`,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
-		var foundErr error
-		var found_component *[]cbs.ComponentDTO
+		// var foundErr error
+		// var found_component *[]cbs.ComponentDTO
 
 		label_endpoint, _ := cmd.Flags().GetString("label")
 		if label_endpoint == "" {
@@ -53,12 +51,12 @@ var componentFindAllCmd = &cobra.Command{
 		}
 		logrus.Debug("Use endpoint: ", endpoint)
 
-		if found_component, foundErr = cbs.FindAllComponent(endpoint); foundErr != nil {
-			return foundErr
-		}
-		for index, value := range *found_component {
-			fmt.Printf("Index: %d, Value: %d\n", index, value.Name)
-		}
+		// if found_component, foundErr = cbs.FindAllComponent(endpoint); foundErr != nil {
+		// 	return foundErr
+		// }
+		// for index, value := range *found_component {
+		// 	fmt.Printf("Index: %d, Value: %d\n", index, value.Name)
+		// }
 		return nil
 	},
 }

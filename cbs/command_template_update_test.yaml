@@ -1,0 +1,16 @@
+name: copy updated
+description: copy file or directory from source to destination updated
+parameters:
+  - name: source
+    description: source file or directory path
+  - name: destination_dir
+    description: destination directory path
+commandExecutionsLayers:
+  - engine: shell
+    architecture: 
+      - linux
+    operatingSystem:
+      - ubuntu
+      - redhat 
+    executionCommands: 
+      - cp -r ${source} ${destination_dir}
