@@ -93,6 +93,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out code
+        uses: actions/checkout@v3
       - name: Download artifacts
         uses: actions/download-artifact@v3
 
@@ -108,7 +110,7 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Create Release
         id: create_release
         if: env.RELEASE_EXISTS == 'false'
