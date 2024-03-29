@@ -66,6 +66,36 @@ type ApiResultResponseBoolean struct {
 	Payload *bool `json:"payload,omitempty"`
 }
 
+// ApiResultResponseCommandTemplateDTO defines model for ApiResultResponseCommandTemplateDTO.
+type ApiResultResponseCommandTemplateDTO struct {
+	// ErrorCode Is the error code returned from api
+	ErrorCode int32 `json:"errorCode"`
+
+	// ErrorDomain In case of error not equal to 0, an error domain can be reported by api, indicating where the problem is occurred
+	ErrorDomain *string `json:"errorDomain,omitempty"`
+
+	// ErrorMessage In case of error not equal to 0, an error message can be reported by api, indicating what problem is occurred
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// Payload Define details for create a new component
+	Payload *CommandTemplateDTO `json:"payload,omitempty"`
+}
+
+// ApiResultResponseComponentDTO defines model for ApiResultResponseComponentDTO.
+type ApiResultResponseComponentDTO struct {
+	// ErrorCode Is the error code returned from api
+	ErrorCode int32 `json:"errorCode"`
+
+	// ErrorDomain In case of error not equal to 0, an error domain can be reported by api, indicating where the problem is occurred
+	ErrorDomain *string `json:"errorDomain,omitempty"`
+
+	// ErrorMessage In case of error not equal to 0, an error message can be reported by api, indicating what problem is occurred
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// Payload Define the single component
+	Payload *ComponentDTO `json:"payload,omitempty"`
+}
+
 // ApiResultResponseListAuthenticationTokenDTO defines model for ApiResultResponseListAuthenticationTokenDTO.
 type ApiResultResponseListAuthenticationTokenDTO struct {
 	// ErrorCode Is the error code returned from api
@@ -96,8 +126,8 @@ type ApiResultResponseListAuthorizationDTO struct {
 	Payload *[]AuthorizationDTO `json:"payload,omitempty"`
 }
 
-// ApiResultResponseListComponentDTO defines model for ApiResultResponseListComponentDTO.
-type ApiResultResponseListComponentDTO struct {
+// ApiResultResponseListCommandTemplateSummaryDTO defines model for ApiResultResponseListCommandTemplateSummaryDTO.
+type ApiResultResponseListCommandTemplateSummaryDTO struct {
 	// ErrorCode Is the error code returned from api
 	ErrorCode int32 `json:"errorCode"`
 
@@ -108,7 +138,22 @@ type ApiResultResponseListComponentDTO struct {
 	ErrorMessage *string `json:"errorMessage,omitempty"`
 
 	// Payload Is the value returned by api
-	Payload *[]ComponentDTO `json:"payload,omitempty"`
+	Payload *[]CommandTemplateSummaryDTO `json:"payload,omitempty"`
+}
+
+// ApiResultResponseListComponentSummaryDTO defines model for ApiResultResponseListComponentSummaryDTO.
+type ApiResultResponseListComponentSummaryDTO struct {
+	// ErrorCode Is the error code returned from api
+	ErrorCode int32 `json:"errorCode"`
+
+	// ErrorDomain In case of error not equal to 0, an error domain can be reported by api, indicating where the problem is occurred
+	ErrorDomain *string `json:"errorDomain,omitempty"`
+
+	// ErrorMessage In case of error not equal to 0, an error message can be reported by api, indicating what problem is occurred
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// Payload Is the value returned by api
+	Payload *[]ComponentSummaryDTO `json:"payload,omitempty"`
 }
 
 // ApiResultResponseListGroupDTO defines model for ApiResultResponseListGroupDTO.
@@ -220,13 +265,112 @@ type AuthorizationDTOAuthorizationType string
 // AuthorizationDTOOwnerType Is the type of the owner [User, Group, Application]
 type AuthorizationDTOOwnerType string
 
+// CommandTemplateDTO Define details for create a new component
+type CommandTemplateDTO struct {
+	// CommandExecutionsLayers Those are the list of the action that the command will take
+	CommandExecutionsLayers *[]ExecutionPipelineDTO `json:"commandExecutionsLayers,omitempty"`
+
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
+	// Id The id of the component
+	Id *string `json:"id,omitempty"`
+
+	// Name The name of the component
+	Name *string `json:"name,omitempty"`
+
+	// Parameters The parameter used by the command
+	Parameters *[]CommandTemplateParameterDTO `json:"parameters,omitempty"`
+}
+
+// CommandTemplateInstanceDTO Define an instance of the command template with the parameters values
+type CommandTemplateInstanceDTO struct {
+	// Id The id of the component
+	Id *string `json:"id,omitempty"`
+
+	// Parameters The parameter/values map
+	Parameters *[]CommandTemplateInstanceParameterDTO `json:"parameters,omitempty"`
+}
+
+// CommandTemplateInstanceParameterDTO Define an instance of the command template with the parameters values
+type CommandTemplateInstanceParameterDTO struct {
+	// Name The name of the parameter
+	Name *string `json:"name,omitempty"`
+
+	// Value The values
+	Value *string `json:"value,omitempty"`
+}
+
+// CommandTemplateParameterDTO Define a single command parameter
+type CommandTemplateParameterDTO struct {
+	// Description The description of the parameter
+	Description string `json:"description"`
+
+	// Name The name of the component
+	Name string `json:"name"`
+}
+
+// CommandTemplateSummaryDTO Define details for create a new component
+type CommandTemplateSummaryDTO struct {
+	// CommandExecutionsLayers Those are the list of the action that the command will take
+	CommandExecutionsLayers *[]ExecutionPipelineDTO `json:"commandExecutionsLayers,omitempty"`
+
+	// Id The id of the component
+	Id *string `json:"id,omitempty"`
+
+	// Name The name of the component
+	Name *string `json:"name,omitempty"`
+
+	// Parameters The parameter used by the command
+	Parameters *[]CommandTemplateParameterDTO `json:"parameters,omitempty"`
+}
+
 // ComponentDTO Define the single component
 type ComponentDTO struct {
+	// CommandTemplatesInstances The list command template instances to execute to build the component.
+	CommandTemplatesInstances *[]CommandTemplateInstanceDTO `json:"commandTemplatesInstances,omitempty"`
+
+	// DependOnComponentIds The list of unique identifier of the components that this component depends on.
+	DependOnComponentIds *[]string `json:"dependOnComponentIds,omitempty"`
+
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
 	// Id The unique identifier of the component
 	Id *string `json:"id,omitempty"`
 
 	// Name The name of the component
 	Name *string `json:"name,omitempty"`
+
+	// Url The URL of the component [src, artifact, etc.]
+	Url *string `json:"url,omitempty"`
+}
+
+// ComponentSummaryDTO Define the single component
+type ComponentSummaryDTO struct {
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
+	// Id The unique identifier of the component
+	Id *string `json:"id,omitempty"`
+
+	// Name The name of the component
+	Name *string `json:"name,omitempty"`
+}
+
+// ExecutionPipelineDTO Define details for create a new execution pipeline for a command
+type ExecutionPipelineDTO struct {
+	// Architecture The architecture where the pipeline can work
+	Architecture *[]string `json:"architecture,omitempty"`
+
+	// Engine The name of the pipeline
+	Engine *string `json:"engine,omitempty"`
+
+	// ExecutionCommands The list of the commands that the pipeline will execute
+	ExecutionCommands *[]string `json:"executionCommands,omitempty"`
+
+	// OperatingSystem The operating system where the pipeline can work
+	OperatingSystem *[]string `json:"operatingSystem,omitempty"`
 }
 
 // GroupDTO The group of the user
@@ -241,19 +385,37 @@ type NewAuthenticationTokenDTO struct {
 	Name       *string             `json:"name,omitempty"`
 }
 
-// NewComponentDTO Define details for create a new component
-type NewComponentDTO struct {
-	// BuildCommandTemplateIds The list of unique identifier of the command templates that this component uses to build.
-	BuildCommandTemplateIds []string `json:"buildCommandTemplateIds"`
+// NewCommandTemplateDTO Define details for create a new component
+type NewCommandTemplateDTO struct {
+	// CommandExecutionsLayers Those are the list of the action that the command will take
+	CommandExecutionsLayers []ExecutionPipelineDTO `json:"commandExecutionsLayers"`
 
-	// DependOnComponentIds The list of unique identifier of the components that this component depends on.
-	DependOnComponentIds *[]string `json:"dependOnComponentIds,omitempty"`
+	// Description The description of the component
+	Description string `json:"description"`
 
 	// Name The name of the component
 	Name string `json:"name"`
 
-	// Url The URL of the component [src, artifact, etc.]
-	Url string `json:"url"`
+	// Parameters The parameter used by the command
+	Parameters []CommandTemplateParameterDTO `json:"parameters"`
+}
+
+// NewComponentDTO Define details for create a new component
+type NewComponentDTO struct {
+	// CommandTemplates The list of command templates that the component will use.
+	CommandTemplates *[]CommandTemplateDTO `json:"commandTemplates,omitempty"`
+
+	// CommandTemplatesInstances The list command template instances to execute to build the component.
+	CommandTemplatesInstances []CommandTemplateInstanceDTO `json:"commandTemplatesInstances"`
+
+	// DependOnComponentIds The list of unique identifier of the components that this component depends on.
+	DependOnComponentIds *[]string `json:"dependOnComponentIds,omitempty"`
+
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
+	// Name The name of the component
+	Name string `json:"name"`
 
 	// Version The version of the component
 	Version string `json:"version"`
@@ -266,6 +428,39 @@ type PersonDTO struct {
 	Mail       *string `json:"mail,omitempty"`
 	Surname    *string `json:"surname,omitempty"`
 	Uid        *string `json:"uid,omitempty"`
+}
+
+// UpdateCommandTemplateDTO Define details for create a new component
+type UpdateCommandTemplateDTO struct {
+	// CommandExecutionsLayers Those are the list of the action that the command will take
+	CommandExecutionsLayers *[]ExecutionPipelineDTO `json:"commandExecutionsLayers,omitempty"`
+
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
+	// Name The name of the component
+	Name *string `json:"name,omitempty"`
+
+	// Parameters The parameter used by the command
+	Parameters *[]CommandTemplateParameterDTO `json:"parameters,omitempty"`
+}
+
+// UpdateComponentDTO Define the single component
+type UpdateComponentDTO struct {
+	// CommandTemplatesInstances The list command template instances to execute to build the component.
+	CommandTemplatesInstances *[]CommandTemplateInstanceDTO `json:"commandTemplatesInstances,omitempty"`
+
+	// DependOnComponentIds The list of unique identifier of the components that this component depends on.
+	DependOnComponentIds *[]string `json:"dependOnComponentIds,omitempty"`
+
+	// Description The description of the component
+	Description *string `json:"description,omitempty"`
+
+	// Name The name of the component
+	Name *string `json:"name,omitempty"`
+
+	// Url The URL of the component [src, artifact, etc.]
+	Url *string `json:"url,omitempty"`
 }
 
 // FindGroupsParams defines parameters for FindGroups.
@@ -283,8 +478,17 @@ type FindPeopleParams struct {
 // CreateNewAuthenticationTokenJSONRequestBody defines body for CreateNewAuthenticationToken for application/json ContentType.
 type CreateNewAuthenticationTokenJSONRequestBody = NewAuthenticationTokenDTO
 
+// Create1JSONRequestBody defines body for Create1 for application/json ContentType.
+type Create1JSONRequestBody = NewCommandTemplateDTO
+
+// UpdateById1JSONRequestBody defines body for UpdateById1 for application/json ContentType.
+type UpdateById1JSONRequestBody = UpdateCommandTemplateDTO
+
 // CreateJSONRequestBody defines body for Create for application/json ContentType.
 type CreateJSONRequestBody = NewComponentDTO
+
+// UpdateByIdJSONRequestBody defines body for UpdateById for application/json ContentType.
+type UpdateByIdJSONRequestBody = UpdateComponentDTO
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -388,6 +592,25 @@ type ClientInterface interface {
 	// FindPeople request
 	FindPeople(ctx context.Context, params *FindPeopleParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// ListAllComponent1 request
+	ListAllComponent1(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// Create1WithBody request with any body
+	Create1WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	Create1(ctx context.Context, body Create1JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteById1 request
+	DeleteById1(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FindById1 request
+	FindById1(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateById1WithBody request with any body
+	UpdateById1WithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateById1(ctx context.Context, id string, body UpdateById1JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// ListAllComponent request
 	ListAllComponent(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -395,6 +618,17 @@ type ClientInterface interface {
 	CreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteById request
+	DeleteById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FindById request
+	FindById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateByIdWithBody request with any body
+	UpdateByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateById(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Echo request
 	Echo(ctx context.Context, value string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -523,6 +757,90 @@ func (c *Client) FindPeople(ctx context.Context, params *FindPeopleParams, reqEd
 	return c.Client.Do(req)
 }
 
+func (c *Client) ListAllComponent1(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListAllComponent1Request(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Create1WithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreate1RequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Create1(ctx context.Context, body Create1JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreate1Request(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteById1(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteById1Request(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) FindById1(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFindById1Request(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateById1WithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateById1RequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateById1(ctx context.Context, id string, body UpdateById1JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateById1Request(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) ListAllComponent(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListAllComponentRequest(c.Server)
 	if err != nil {
@@ -549,6 +867,54 @@ func (c *Client) CreateWithBody(ctx context.Context, contentType string, body io
 
 func (c *Client) Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteByIdRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) FindById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFindByIdRequest(c.Server, id)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateByIdRequestWithBody(c.Server, id, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateById(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateByIdRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -904,6 +1270,188 @@ func NewFindPeopleRequest(server string, params *FindPeopleParams) (*http.Reques
 	return req, nil
 }
 
+// NewListAllComponent1Request generates requests for ListAllComponent1
+func NewListAllComponent1Request(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/command")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewCreate1Request calls the generic Create1 builder with application/json body
+func NewCreate1Request(server string, body Create1JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreate1RequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewCreate1RequestWithBody generates requests for Create1 with any type of body
+func NewCreate1RequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/command")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteById1Request generates requests for DeleteById1
+func NewDeleteById1Request(server string, id string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/command/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewFindById1Request generates requests for FindById1
+func NewFindById1Request(server string, id string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/command/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateById1Request calls the generic UpdateById1 builder with application/json body
+func NewUpdateById1Request(server string, id string, body UpdateById1JSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateById1RequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateById1RequestWithBody generates requests for UpdateById1 with any type of body
+func NewUpdateById1RequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/command/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewListAllComponentRequest generates requests for ListAllComponent
 func NewListAllComponentRequest(server string) (*http.Request, error) {
 	var err error
@@ -962,6 +1510,121 @@ func NewCreateRequestWithBody(server string, contentType string, body io.Reader)
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteByIdRequest generates requests for DeleteById
+func NewDeleteByIdRequest(server string, id string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/component/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewFindByIdRequest generates requests for FindById
+func NewFindByIdRequest(server string, id string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/component/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateByIdRequest calls the generic UpdateById builder with application/json body
+func NewUpdateByIdRequest(server string, id string, body UpdateByIdJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateByIdRequestWithBody(server, id, "application/json", bodyReader)
+}
+
+// NewUpdateByIdRequestWithBody generates requests for UpdateById with any type of body
+func NewUpdateByIdRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "id", runtime.ParamLocationPath, id)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/component/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1104,6 +1767,25 @@ type ClientWithResponsesInterface interface {
 	// FindPeopleWithResponse request
 	FindPeopleWithResponse(ctx context.Context, params *FindPeopleParams, reqEditors ...RequestEditorFn) (*FindPeopleResponse, error)
 
+	// ListAllComponent1WithResponse request
+	ListAllComponent1WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllComponent1Response, error)
+
+	// Create1WithBodyWithResponse request with any body
+	Create1WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*Create1Response, error)
+
+	Create1WithResponse(ctx context.Context, body Create1JSONRequestBody, reqEditors ...RequestEditorFn) (*Create1Response, error)
+
+	// DeleteById1WithResponse request
+	DeleteById1WithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteById1Response, error)
+
+	// FindById1WithResponse request
+	FindById1WithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindById1Response, error)
+
+	// UpdateById1WithBodyWithResponse request with any body
+	UpdateById1WithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateById1Response, error)
+
+	UpdateById1WithResponse(ctx context.Context, id string, body UpdateById1JSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateById1Response, error)
+
 	// ListAllComponentWithResponse request
 	ListAllComponentWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllComponentResponse, error)
 
@@ -1111,6 +1793,17 @@ type ClientWithResponsesInterface interface {
 	CreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	CreateWithResponse(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+
+	// DeleteByIdWithResponse request
+	DeleteByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteByIdResponse, error)
+
+	// FindByIdWithResponse request
+	FindByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindByIdResponse, error)
+
+	// UpdateByIdWithBodyWithResponse request with any body
+	UpdateByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error)
+
+	UpdateByIdWithResponse(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error)
 
 	// EchoWithResponse request
 	EchoWithResponse(ctx context.Context, value string, reqEditors ...RequestEditorFn) (*EchoResponse, error)
@@ -1317,10 +2010,120 @@ func (r FindPeopleResponse) StatusCode() int {
 	return 0
 }
 
+type ListAllComponent1Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseListCommandTemplateSummaryDTO
+}
+
+// Status returns HTTPResponse.Status
+func (r ListAllComponent1Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ListAllComponent1Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type Create1Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *ApiResultResponseString
+}
+
+// Status returns HTTPResponse.Status
+func (r Create1Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r Create1Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteById1Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseBoolean
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteById1Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteById1Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type FindById1Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseCommandTemplateDTO
+}
+
+// Status returns HTTPResponse.Status
+func (r FindById1Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FindById1Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateById1Response struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseBoolean
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateById1Response) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateById1Response) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ListAllComponentResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ApiResultResponseListComponentDTO
+	JSON200      *ApiResultResponseListComponentSummaryDTO
 }
 
 // Status returns HTTPResponse.Status
@@ -1355,6 +2158,72 @@ func (r CreateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteByIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseBoolean
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type FindByIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseComponentDTO
+}
+
+// Status returns HTTPResponse.Status
+func (r FindByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FindByIdResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateByIdResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseBoolean
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateByIdResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1494,6 +2363,67 @@ func (c *ClientWithResponses) FindPeopleWithResponse(ctx context.Context, params
 	return ParseFindPeopleResponse(rsp)
 }
 
+// ListAllComponent1WithResponse request returning *ListAllComponent1Response
+func (c *ClientWithResponses) ListAllComponent1WithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllComponent1Response, error) {
+	rsp, err := c.ListAllComponent1(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseListAllComponent1Response(rsp)
+}
+
+// Create1WithBodyWithResponse request with arbitrary body returning *Create1Response
+func (c *ClientWithResponses) Create1WithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*Create1Response, error) {
+	rsp, err := c.Create1WithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreate1Response(rsp)
+}
+
+func (c *ClientWithResponses) Create1WithResponse(ctx context.Context, body Create1JSONRequestBody, reqEditors ...RequestEditorFn) (*Create1Response, error) {
+	rsp, err := c.Create1(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseCreate1Response(rsp)
+}
+
+// DeleteById1WithResponse request returning *DeleteById1Response
+func (c *ClientWithResponses) DeleteById1WithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteById1Response, error) {
+	rsp, err := c.DeleteById1(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteById1Response(rsp)
+}
+
+// FindById1WithResponse request returning *FindById1Response
+func (c *ClientWithResponses) FindById1WithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindById1Response, error) {
+	rsp, err := c.FindById1(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFindById1Response(rsp)
+}
+
+// UpdateById1WithBodyWithResponse request with arbitrary body returning *UpdateById1Response
+func (c *ClientWithResponses) UpdateById1WithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateById1Response, error) {
+	rsp, err := c.UpdateById1WithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateById1Response(rsp)
+}
+
+func (c *ClientWithResponses) UpdateById1WithResponse(ctx context.Context, id string, body UpdateById1JSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateById1Response, error) {
+	rsp, err := c.UpdateById1(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateById1Response(rsp)
+}
+
 // ListAllComponentWithResponse request returning *ListAllComponentResponse
 func (c *ClientWithResponses) ListAllComponentWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllComponentResponse, error) {
 	rsp, err := c.ListAllComponent(ctx, reqEditors...)
@@ -1518,6 +2448,41 @@ func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, body Creat
 		return nil, err
 	}
 	return ParseCreateResponse(rsp)
+}
+
+// DeleteByIdWithResponse request returning *DeleteByIdResponse
+func (c *ClientWithResponses) DeleteByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteByIdResponse, error) {
+	rsp, err := c.DeleteById(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteByIdResponse(rsp)
+}
+
+// FindByIdWithResponse request returning *FindByIdResponse
+func (c *ClientWithResponses) FindByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindByIdResponse, error) {
+	rsp, err := c.FindById(ctx, id, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFindByIdResponse(rsp)
+}
+
+// UpdateByIdWithBodyWithResponse request with arbitrary body returning *UpdateByIdResponse
+func (c *ClientWithResponses) UpdateByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error) {
+	rsp, err := c.UpdateByIdWithBody(ctx, id, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateByIdResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateByIdWithResponse(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error) {
+	rsp, err := c.UpdateById(ctx, id, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateByIdResponse(rsp)
 }
 
 // EchoWithResponse request returning *EchoResponse
@@ -1772,6 +2737,136 @@ func ParseFindPeopleResponse(rsp *http.Response) (*FindPeopleResponse, error) {
 	return response, nil
 }
 
+// ParseListAllComponent1Response parses an HTTP response from a ListAllComponent1WithResponse call
+func ParseListAllComponent1Response(rsp *http.Response) (*ListAllComponent1Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ListAllComponent1Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseListCommandTemplateSummaryDTO
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreate1Response parses an HTTP response from a Create1WithResponse call
+func ParseCreate1Response(rsp *http.Response) (*Create1Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &Create1Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest ApiResultResponseString
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteById1Response parses an HTTP response from a DeleteById1WithResponse call
+func ParseDeleteById1Response(rsp *http.Response) (*DeleteById1Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteById1Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseBoolean
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFindById1Response parses an HTTP response from a FindById1WithResponse call
+func ParseFindById1Response(rsp *http.Response) (*FindById1Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FindById1Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseCommandTemplateDTO
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateById1Response parses an HTTP response from a UpdateById1WithResponse call
+func ParseUpdateById1Response(rsp *http.Response) (*UpdateById1Response, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateById1Response{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseBoolean
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseListAllComponentResponse parses an HTTP response from a ListAllComponentWithResponse call
 func ParseListAllComponentResponse(rsp *http.Response) (*ListAllComponentResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -1787,7 +2882,7 @@ func ParseListAllComponentResponse(rsp *http.Response) (*ListAllComponentRespons
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ApiResultResponseListComponentDTO
+		var dest ApiResultResponseListComponentSummaryDTO
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1818,6 +2913,84 @@ func ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 			return nil, err
 		}
 		response.JSON201 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteByIdResponse parses an HTTP response from a DeleteByIdWithResponse call
+func ParseDeleteByIdResponse(rsp *http.Response) (*DeleteByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseBoolean
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFindByIdResponse parses an HTTP response from a FindByIdWithResponse call
+func ParseFindByIdResponse(rsp *http.Response) (*FindByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FindByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseComponentDTO
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseUpdateByIdResponse parses an HTTP response from a UpdateByIdWithResponse call
+func ParseUpdateByIdResponse(rsp *http.Response) (*UpdateByIdResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateByIdResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseBoolean
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
 
 	}
 
@@ -1905,12 +3078,36 @@ type ServerInterface interface {
 
 	// (GET /v1/auth/users)
 	FindPeople(ctx echo.Context, params FindPeopleParams) error
-	// Download a content from a file entry
+	// List all command templates
+	// (GET /v1/command)
+	ListAllComponent1(ctx echo.Context) error
+	// Create a new component
+	// (POST /v1/command)
+	Create1(ctx echo.Context) error
+	// Return a command template by its unique identifier
+	// (DELETE /v1/command/{id})
+	DeleteById1(ctx echo.Context, id string) error
+	// List all command templates
+	// (GET /v1/command/{id})
+	FindById1(ctx echo.Context, id string) error
+	// Update a command template by its unique identifier
+	// (PUT /v1/command/{id})
+	UpdateById1(ctx echo.Context, id string) error
+	// List all components
 	// (GET /v1/component)
 	ListAllComponent(ctx echo.Context) error
-	// Download a content from a file entry
+	// Create a new component
 	// (POST /v1/component)
 	Create(ctx echo.Context) error
+	// Delete a component by his id
+	// (DELETE /v1/component/{id})
+	DeleteById(ctx echo.Context, id string) error
+	// Find a component by an id
+	// (GET /v1/component/{id})
+	FindById(ctx echo.Context, id string) error
+	// Delete a component by his id
+	// (PUT /v1/component/{id})
+	UpdateById(ctx echo.Context, id string) error
 	// Example api that realize an ECHO
 	// (GET /v1/echo/test/{value})
 	Echo(ctx echo.Context, value string) error
@@ -2044,6 +3241,72 @@ func (w *ServerInterfaceWrapper) FindPeople(ctx echo.Context) error {
 	return err
 }
 
+// ListAllComponent1 converts echo context to params.
+func (w *ServerInterfaceWrapper) ListAllComponent1(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.ListAllComponent1(ctx)
+	return err
+}
+
+// Create1 converts echo context to params.
+func (w *ServerInterfaceWrapper) Create1(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.Create1(ctx)
+	return err
+}
+
+// DeleteById1 converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteById1(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteById1(ctx, id)
+	return err
+}
+
+// FindById1 converts echo context to params.
+func (w *ServerInterfaceWrapper) FindById1(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.FindById1(ctx, id)
+	return err
+}
+
+// UpdateById1 converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateById1(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.UpdateById1(ctx, id)
+	return err
+}
+
 // ListAllComponent converts echo context to params.
 func (w *ServerInterfaceWrapper) ListAllComponent(ctx echo.Context) error {
 	var err error
@@ -2059,6 +3322,54 @@ func (w *ServerInterfaceWrapper) Create(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.Create(ctx)
+	return err
+}
+
+// DeleteById converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteById(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.DeleteById(ctx, id)
+	return err
+}
+
+// FindById converts echo context to params.
+func (w *ServerInterfaceWrapper) FindById(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.FindById(ctx, id)
+	return err
+}
+
+// UpdateById converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateById(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", ctx.Param("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.UpdateById(ctx, id)
 	return err
 }
 
@@ -2124,8 +3435,16 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/v1/auth/root/:email", wrapper.RemoveAsRootUser)
 	router.POST(baseURL+"/v1/auth/root/:email", wrapper.SetRootUser)
 	router.GET(baseURL+"/v1/auth/users", wrapper.FindPeople)
+	router.GET(baseURL+"/v1/command", wrapper.ListAllComponent1)
+	router.POST(baseURL+"/v1/command", wrapper.Create1)
+	router.DELETE(baseURL+"/v1/command/:id", wrapper.DeleteById1)
+	router.GET(baseURL+"/v1/command/:id", wrapper.FindById1)
+	router.PUT(baseURL+"/v1/command/:id", wrapper.UpdateById1)
 	router.GET(baseURL+"/v1/component", wrapper.ListAllComponent)
 	router.POST(baseURL+"/v1/component", wrapper.Create)
+	router.DELETE(baseURL+"/v1/component/:id", wrapper.DeleteById)
+	router.GET(baseURL+"/v1/component/:id", wrapper.FindById)
+	router.PUT(baseURL+"/v1/component/:id", wrapper.UpdateById)
 	router.GET(baseURL+"/v1/echo/test/:value", wrapper.Echo)
 	router.GET(baseURL+"/v1/mock/users-auth", wrapper.GetMockUser)
 
@@ -2134,37 +3453,48 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
