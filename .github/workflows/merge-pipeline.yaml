@@ -45,7 +45,7 @@ jobs:
         go test -v ./...
       env:
           CBS_TEST_HOST: http://localhost:8081
-           WAIT_HOSTS: localhost:8081
+          WAIT_HOSTS: localhost:8081
 
     - name: Shutdown test backend
       if: steps.check_files.outputs.files_exists == 'true' &&  (success() || failure())
