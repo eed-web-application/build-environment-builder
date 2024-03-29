@@ -10,7 +10,7 @@ import (
 
 // Replace "path/to/cbsapi" with the actual import path of the "cbsapi" package
 
-func getClient(host string) (*ClientWithResponses, error) {
+func GetClient(host string) (*ClientWithResponses, error) {
 	apiKeyProvider, apiKeyProviderErr := securityprovider.NewSecurityProviderApiKey("header", "X-API-Key", "MY_API_KEY")
 	if apiKeyProviderErr != nil {
 		logrus.Error(fmt.Printf("error setting the security provider: %v", apiKeyProviderErr))
@@ -26,7 +26,7 @@ func getClient(host string) (*ClientWithResponses, error) {
 
 // FindAllComponent is the function to get all the components
 func FindAllComponent(host string) (*[]ComponentSummaryDTO, error) {
-	client, clientErr := getClient(host)
+	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return nil, clientErr
 	}
@@ -41,7 +41,7 @@ func FindAllComponent(host string) (*[]ComponentSummaryDTO, error) {
 
 // CreateNewComponent create a new component  and return the id
 func CreateNewComponent(host string, component NewComponentDTO) (*string, error) {
-	client, clientErr := getClient(host)
+	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return nil, clientErr
 	}
@@ -61,12 +61,12 @@ func CreateNewComponent(host string, component NewComponentDTO) (*string, error)
 
 // CreateNewCommandTemplate create a new command template and return the id
 func CreateNewCommandTemplate(host string, new_command NewCommandTemplateDTO) (*string, error) {
-	client, clientErr := getClient(host)
+	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return nil, clientErr
 	}
 
-	result, err := client.Create1WithResponse(context.Background(), new_command)
+	result, err := client.CreateCommandWithResponse(context.Background(), new_command)
 	if err != nil {
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return nil, err
@@ -81,12 +81,12 @@ func CreateNewCommandTemplate(host string, new_command NewCommandTemplateDTO) (*
 
 // DeleteCommandTemplate delete a command template by id
 func DeleteCommandTemplate(host string, id string) error {
-	client, clientErr := getClient(host)
+	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return clientErr
 	}
 
-	result, err := client.DeleteById1WithResponse(context.Background(), id)
+	result, err := client.DeleteCommandByIdWithResponse(context.Background(), id)
 	if err != nil {
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return err
