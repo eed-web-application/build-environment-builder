@@ -68,6 +68,8 @@ jobs:
       run: |
         GOOS=linux GOARCH=amd64 go build -o cbs-linux-amd64
         tar -czvf cbs-linux-amd64.tar.gz -C . cbs-linux-amd64
+        CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o cbs-linux-static-amd64
+        tar -czvf cbs-linux-static-amd64.tar.gz -C . cbs-linux-static-amd64
       env:
         GO111MODULE: on
 
@@ -118,6 +120,7 @@ jobs:
         with:
           files: |
             artifacts/cbs-linux-amd64.tar.gz
+            artifacts/cbs-linux-static-amd64.tar.gz
             artifacts/cbs-darwin-amd64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -128,6 +131,7 @@ jobs:
         with:
           files: |
             artifacts/cbs-linux-amd64.tar.gz
+            artifacts/cbs-linux-static-amd64.tar.gz
             artifacts/cbs-darwin-amd64.tar.gz
           tag_name: ${{ github.ref_name }}
         env:
