@@ -83,14 +83,8 @@ jobs:
     - name: Archive Linux binary
       uses: actions/upload-artifact@v3
       with:
-        name: cbs-darwin-amd64.tar.gz
-        path: cbs-darwin-amd64.tar.gz
-
-    - name: Archive macOS binary
-      uses: actions/upload-artifact@v3
-      with:
-        name: cbs-linux-amd64.tar.gz
-        path: cbs-linux-amd64.tar.gz
+        name: builded-artifacts
+        path: cbs-*-amd64.tar.gz
 
   create-and-upload-release:
     needs: build
@@ -102,10 +96,11 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
+          name: builded-artifacts
           path: artifacts
       - name: list artifacts
         run: |
-          ls -la artifacts/
+          ls -R artifacts/
       - name: Determine if release exists
         id: check_release
         run: |
