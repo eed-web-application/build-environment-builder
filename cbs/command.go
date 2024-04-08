@@ -14,7 +14,7 @@ func CreateNewCommandTemplate(host string, new_command *NewCommandTemplateDTO) (
 		return nil, clientErr
 	}
 
-	result, err := client.CreateCommandWithResponse(context.Background(), *new_command)
+	result, err := client.CreateNewCommandWithResponse(context.Background(), *new_command)
 	if err != nil {
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return nil, err

@@ -31,7 +31,7 @@ func CreateNewComponent(host string, component NewComponentDTO) (*string, error)
 		return nil, clientErr
 	}
 
-	result, err := client.CreateWithResponse(context.Background(), component)
+	result, err := client.CreateNewComponentWithResponse(context.Background(), component)
 	if err != nil {
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return nil, err

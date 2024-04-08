@@ -47,6 +47,14 @@
             "mode": "auto",
             "program": "${workspaceFolder}/main.go",
             "args": ["--label=dev", "command", "show", "${input:commandId}"]
+        },
+        {
+            "name": "Engine lists",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/main.go",
+            "args": ["--label=dev", "engine", "list"]
         }
     ],
     "inputs": [
