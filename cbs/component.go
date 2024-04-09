@@ -25,13 +25,13 @@ func FindAllComponent(host string) (*[]ComponentSummaryDTO, error) {
 }
 
 // CreateNewComponent create a new component  and return the id
-func CreateNewComponent(host string, component NewComponentDTO) (*string, error) {
+func CreateNewComponent(host string, component *NewComponentDTO) (*string, error) {
 	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return nil, clientErr
 	}
 
-	result, err := client.CreateNewComponentWithResponse(context.Background(), component)
+	result, err := client.CreateNewComponentWithResponse(context.Background(), *component)
 	if err != nil {
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return nil, err

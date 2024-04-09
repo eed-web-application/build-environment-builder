@@ -1,10 +1,10 @@
 package cbs
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
-	openapi_types "github.com/oapi-codegen/runtime/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -32,8 +32,8 @@ func FetchAllEngines(host string) (*[]string, error) {
 	return result.JSON200.Payload, nil
 }
 
-// FetchArtifactForComponents fetch all engines
-func GenerateComponentArtifact(host string, param *GenerateComponentArtifactParams) (*openapi_types.File, error) {
+// GenerateComponentArtifact fetch all engines
+func GenerateComponentArtifact(host string, param *GenerateComponentArtifactParams) (*bytes.Reader, error) {
 	client, clientErr := GetClient(host)
 	if clientErr != nil {
 		return nil, clientErr
@@ -44,8 +44,8 @@ func GenerateComponentArtifact(host string, param *GenerateComponentArtifactPara
 		logrus.Error(fmt.Printf("error calling API: %v", err))
 		return nil, err
 	}
-	if result.JSON200 != nil {
-		return nil, fmt.Errorf("no content return calling API")
+	if result.Body != nil {
+		return bytes.NewReader(result.Body), nil
 	} else if result.JSON200 == nil {
 		if json, err := DecodeReponse(result.Body); err == nil {
 			return nil, fmt.Errorf("error calling API: %v", (*json)["errorMessage"])
@@ -53,5 +53,5 @@ func GenerateComponentArtifact(host string, param *GenerateComponentArtifactPara
 			return nil, fmt.Errorf("error calling API: %v", "No response")
 		}
 	}
-	return result.JSON200, nil
+	return nil, nil
 }

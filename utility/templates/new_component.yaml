@@ -1,0 +1,23 @@
+name: copy
+description: copy file or directory from source to destination
+version: 1.0
+#component that this one depends on
+dependOnComponentIds:
+  - componentId
+# command that this component uses
+commandTemplatesInstances:
+  - id: commandId
+    parameters:
+      - name_1: value_1
+        name_2: value_2
+#commadn that belongs only to this specific component
+commandTemplates:
+  - commandExecutionsLayers:
+      - engine: shell
+        architecture: 
+          - linux
+        operatingSystem:
+          - ubuntu
+          - redhat 
+        executionCommands: 
+          - cp -r /src /dest
