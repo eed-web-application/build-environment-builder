@@ -83,7 +83,7 @@ var generateCMD = &cobra.Command{
 		var key_value []string
 		var artifact *bytes.Reader
 
-		engine_param := make(map[string]interface{})
+		engine_param := make(map[string]string)
 
 		label_endpoint, _ := cmd.Flags().GetString("label")
 		if label_endpoint == "" {

@@ -493,7 +493,7 @@ type GenerateComponentArtifactParams struct {
 	ComponentId []string `form:"componentId" json:"componentId"`
 
 	// AllRequestParams is the build specs to use for the generation of the artifact
-	AllRequestParams map[string]interface{} `form:"allRequestParams" json:"allRequestParams"`
+	AllRequestParams map[string]string `form:"allRequestParams" json:"allRequestParams"`
 }
 
 // CreateNewAuthenticationTokenJSONRequestBody defines body for CreateNewAuthenticationToken for application/json ContentType.
