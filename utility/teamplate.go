@@ -10,6 +10,7 @@ import (
 // Use the `//go:embed` directive with the path to your template file or directory.
 // This tells Go to embed the file(s) in the variable `templateFS`.
 //
+//go:embed templates/new_component.yaml
 //go:embed templates/new_command.yaml
 var templateFS embed.FS
 

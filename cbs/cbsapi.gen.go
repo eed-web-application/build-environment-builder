@@ -216,6 +216,21 @@ type ApiResultResponsePersonDTO struct {
 	Payload *PersonDTO `json:"payload,omitempty"`
 }
 
+// ApiResultResponseSetString defines model for ApiResultResponseSetString.
+type ApiResultResponseSetString struct {
+	// ErrorCode Is the error code returned from api
+	ErrorCode int32 `json:"errorCode"`
+
+	// ErrorDomain In case of error not equal to 0, an error domain can be reported by api, indicating where the problem is occurred
+	ErrorDomain *string `json:"errorDomain,omitempty"`
+
+	// ErrorMessage In case of error not equal to 0, an error message can be reported by api, indicating what problem is occurred
+	ErrorMessage *string `json:"errorMessage,omitempty"`
+
+	// Payload Is the value returned by api
+	Payload *[]string `json:"payload,omitempty"`
+}
+
 // ApiResultResponseString defines model for ApiResultResponseString.
 type ApiResultResponseString struct {
 	// ErrorCode Is the error code returned from api
@@ -289,16 +304,7 @@ type CommandTemplateInstanceDTO struct {
 	Id *string `json:"id,omitempty"`
 
 	// Parameters The parameter/values map
-	Parameters *[]CommandTemplateInstanceParameterDTO `json:"parameters,omitempty"`
-}
-
-// CommandTemplateInstanceParameterDTO Define an instance of the command template with the parameters values
-type CommandTemplateInstanceParameterDTO struct {
-	// Name The name of the parameter
-	Name *string `json:"name,omitempty"`
-
-	// Value The values
-	Value *string `json:"value,omitempty"`
+	Parameters *map[string]string `json:"parameters,omitempty"`
 }
 
 // CommandTemplateParameterDTO Define a single command parameter
@@ -390,6 +396,9 @@ type NewCommandTemplateDTO struct {
 	// CommandExecutionsLayers Those are the list of the action that the command will take
 	CommandExecutionsLayers []ExecutionPipelineDTO `json:"commandExecutionsLayers"`
 
+	// DependOnComponents The list of the component that this component depend on
+	DependOnComponents *[]string `json:"dependOnComponents,omitempty"`
+
 	// Description The description of the component
 	Description string `json:"description"`
 
@@ -406,7 +415,7 @@ type NewComponentDTO struct {
 	CommandTemplates *[]CommandTemplateDTO `json:"commandTemplates,omitempty"`
 
 	// CommandTemplatesInstances The list command template instances to execute to build the component.
-	CommandTemplatesInstances []CommandTemplateInstanceDTO `json:"commandTemplatesInstances"`
+	CommandTemplatesInstances *[]CommandTemplateInstanceDTO `json:"commandTemplatesInstances,omitempty"`
 
 	// DependOnComponentIds The list of unique identifier of the components that this component depends on.
 	DependOnComponentIds *[]string `json:"dependOnComponentIds,omitempty"`
@@ -418,7 +427,7 @@ type NewComponentDTO struct {
 	Name string `json:"name"`
 
 	// Version The version of the component
-	Version string `json:"version"`
+	Version *string `json:"version,omitempty"`
 }
 
 // PersonDTO Is the value returned by api
@@ -475,20 +484,32 @@ type FindPeopleParams struct {
 	Search *string `form:"search,omitempty" json:"search,omitempty"`
 }
 
+// GenerateComponentArtifactParams defines parameters for GenerateComponentArtifact.
+type GenerateComponentArtifactParams struct {
+	// EngineName IS the engine to use represented by his name
+	EngineName string `form:"engineName" json:"engineName"`
+
+	// ComponentId Is the list of the component id for wich the artifact should be generated
+	ComponentId []string `form:"componentId" json:"componentId"`
+
+	// AllRequestParams is the build specs to use for the generation of the artifact
+	AllRequestParams map[string]string `form:"allRequestParams" json:"allRequestParams"`
+}
+
 // CreateNewAuthenticationTokenJSONRequestBody defines body for CreateNewAuthenticationToken for application/json ContentType.
 type CreateNewAuthenticationTokenJSONRequestBody = NewAuthenticationTokenDTO
 
-// CreateCommandJSONRequestBody defines body for CreateCommand for application/json ContentType.
-type CreateCommandJSONRequestBody = NewCommandTemplateDTO
+// CreateNewCommandJSONRequestBody defines body for CreateNewCommand for application/json ContentType.
+type CreateNewCommandJSONRequestBody = NewCommandTemplateDTO
 
 // UpdateCommandByIdJSONRequestBody defines body for UpdateCommandById for application/json ContentType.
 type UpdateCommandByIdJSONRequestBody = UpdateCommandTemplateDTO
 
-// CreateJSONRequestBody defines body for Create for application/json ContentType.
-type CreateJSONRequestBody = NewComponentDTO
+// CreateNewComponentJSONRequestBody defines body for CreateNewComponent for application/json ContentType.
+type CreateNewComponentJSONRequestBody = NewComponentDTO
 
-// UpdateByIdJSONRequestBody defines body for UpdateById for application/json ContentType.
-type UpdateByIdJSONRequestBody = UpdateComponentDTO
+// UpdateComponentByIdJSONRequestBody defines body for UpdateComponentById for application/json ContentType.
+type UpdateComponentByIdJSONRequestBody = UpdateComponentDTO
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -595,10 +616,10 @@ type ClientInterface interface {
 	// ListAllCommand request
 	ListAllCommand(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateCommandWithBody request with any body
-	CreateCommandWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateNewCommandWithBody request with any body
+	CreateNewCommandWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateCommand(ctx context.Context, body CreateCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNewCommand(ctx context.Context, body CreateNewCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteCommandById request
 	DeleteCommandById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -614,27 +635,33 @@ type ClientInterface interface {
 	// ListAllComponent request
 	ListAllComponent(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateWithBody request with any body
-	CreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateNewComponentWithBody request with any body
+	CreateNewComponentWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateNewComponent(ctx context.Context, body CreateNewComponentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteById request
-	DeleteById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteComponentById request
+	DeleteComponentById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// FindById request
-	FindById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// FindComponentById request
+	FindComponentById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UpdateByIdWithBody request with any body
-	UpdateByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// UpdateComponentByIdWithBody request with any body
+	UpdateComponentByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateById(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateComponentById(ctx context.Context, id string, body UpdateComponentByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteAll request
 	DeleteAll(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Echo request
 	Echo(ctx context.Context, value string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// FindAllEngineNames request
+	FindAllEngineNames(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GenerateComponentArtifact request
+	GenerateComponentArtifact(ctx context.Context, params *GenerateComponentArtifactParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetMockUser request
 	GetMockUser(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -772,8 +799,8 @@ func (c *Client) ListAllCommand(ctx context.Context, reqEditors ...RequestEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateCommandWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCommandRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateNewCommandWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNewCommandRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -784,8 +811,8 @@ func (c *Client) CreateCommandWithBody(ctx context.Context, contentType string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateCommand(ctx context.Context, body CreateCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateCommandRequest(c.Server, body)
+func (c *Client) CreateNewCommand(ctx context.Context, body CreateNewCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNewCommandRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -856,8 +883,8 @@ func (c *Client) ListAllComponent(ctx context.Context, reqEditors ...RequestEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequestWithBody(c.Server, contentType, body)
+func (c *Client) CreateNewComponentWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNewComponentRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -868,8 +895,8 @@ func (c *Client) CreateWithBody(ctx context.Context, contentType string, body io
 	return c.Client.Do(req)
 }
 
-func (c *Client) Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequest(c.Server, body)
+func (c *Client) CreateNewComponent(ctx context.Context, body CreateNewComponentJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateNewComponentRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -880,8 +907,8 @@ func (c *Client) Create(ctx context.Context, body CreateJSONRequestBody, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteByIdRequest(c.Server, id)
+func (c *Client) DeleteComponentById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteComponentByIdRequest(c.Server, id)
 	if err != nil {
 		return nil, err
 	}
@@ -892,8 +919,8 @@ func (c *Client) DeleteById(ctx context.Context, id string, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-func (c *Client) FindById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewFindByIdRequest(c.Server, id)
+func (c *Client) FindComponentById(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFindComponentByIdRequest(c.Server, id)
 	if err != nil {
 		return nil, err
 	}
@@ -904,8 +931,8 @@ func (c *Client) FindById(ctx context.Context, id string, reqEditors ...RequestE
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateByIdRequestWithBody(c.Server, id, contentType, body)
+func (c *Client) UpdateComponentByIdWithBody(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateComponentByIdRequestWithBody(c.Server, id, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -916,8 +943,8 @@ func (c *Client) UpdateByIdWithBody(ctx context.Context, id string, contentType 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateById(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateByIdRequest(c.Server, id, body)
+func (c *Client) UpdateComponentById(ctx context.Context, id string, body UpdateComponentByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateComponentByIdRequest(c.Server, id, body)
 	if err != nil {
 		return nil, err
 	}
@@ -942,6 +969,30 @@ func (c *Client) DeleteAll(ctx context.Context, reqEditors ...RequestEditorFn) (
 
 func (c *Client) Echo(ctx context.Context, value string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewEchoRequest(c.Server, value)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) FindAllEngineNames(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewFindAllEngineNamesRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GenerateComponentArtifact(ctx context.Context, params *GenerateComponentArtifactParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGenerateComponentArtifactRequest(c.Server, params)
 	if err != nil {
 		return nil, err
 	}
@@ -1312,19 +1363,19 @@ func NewListAllCommandRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewCreateCommandRequest calls the generic CreateCommand builder with application/json body
-func NewCreateCommandRequest(server string, body CreateCommandJSONRequestBody) (*http.Request, error) {
+// NewCreateNewCommandRequest calls the generic CreateNewCommand builder with application/json body
+func NewCreateNewCommandRequest(server string, body CreateNewCommandJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateCommandRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateNewCommandRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateCommandRequestWithBody generates requests for CreateCommand with any type of body
-func NewCreateCommandRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateNewCommandRequestWithBody generates requests for CreateNewCommand with any type of body
+func NewCreateNewCommandRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1494,19 +1545,19 @@ func NewListAllComponentRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewCreateRequest calls the generic Create builder with application/json body
-func NewCreateRequest(server string, body CreateJSONRequestBody) (*http.Request, error) {
+// NewCreateNewComponentRequest calls the generic CreateNewComponent builder with application/json body
+func NewCreateNewComponentRequest(server string, body CreateNewComponentJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRequestWithBody(server, "application/json", bodyReader)
+	return NewCreateNewComponentRequestWithBody(server, "application/json", bodyReader)
 }
 
-// NewCreateRequestWithBody generates requests for Create with any type of body
-func NewCreateRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateNewComponentRequestWithBody generates requests for CreateNewComponent with any type of body
+func NewCreateNewComponentRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1534,8 +1585,8 @@ func NewCreateRequestWithBody(server string, contentType string, body io.Reader)
 	return req, nil
 }
 
-// NewDeleteByIdRequest generates requests for DeleteById
-func NewDeleteByIdRequest(server string, id string) (*http.Request, error) {
+// NewDeleteComponentByIdRequest generates requests for DeleteComponentById
+func NewDeleteComponentByIdRequest(server string, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1568,8 +1619,8 @@ func NewDeleteByIdRequest(server string, id string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewFindByIdRequest generates requests for FindById
-func NewFindByIdRequest(server string, id string) (*http.Request, error) {
+// NewFindComponentByIdRequest generates requests for FindComponentById
+func NewFindComponentByIdRequest(server string, id string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1602,19 +1653,19 @@ func NewFindByIdRequest(server string, id string) (*http.Request, error) {
 	return req, nil
 }
 
-// NewUpdateByIdRequest calls the generic UpdateById builder with application/json body
-func NewUpdateByIdRequest(server string, id string, body UpdateByIdJSONRequestBody) (*http.Request, error) {
+// NewUpdateComponentByIdRequest calls the generic UpdateComponentById builder with application/json body
+func NewUpdateComponentByIdRequest(server string, id string, body UpdateComponentByIdJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateByIdRequestWithBody(server, id, "application/json", bodyReader)
+	return NewUpdateComponentByIdRequestWithBody(server, id, "application/json", bodyReader)
 }
 
-// NewUpdateByIdRequestWithBody generates requests for UpdateById with any type of body
-func NewUpdateByIdRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
+// NewUpdateComponentByIdRequestWithBody generates requests for UpdateComponentById with any type of body
+func NewUpdateComponentByIdRequestWithBody(server string, id string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1700,6 +1751,102 @@ func NewEchoRequest(server string, value string) (*http.Request, error) {
 	queryURL, err := serverURL.Parse(operationPath)
 	if err != nil {
 		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewFindAllEngineNamesRequest generates requests for FindAllEngineNames
+func NewFindAllEngineNamesRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/engine/all")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGenerateComponentArtifactRequest generates requests for GenerateComponentArtifact
+func NewGenerateComponentArtifactRequest(server string, params *GenerateComponentArtifactParams) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/engine/generate")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if params != nil {
+		queryValues := queryURL.Query()
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "engineName", runtime.ParamLocationQuery, params.EngineName); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "componentId", runtime.ParamLocationQuery, params.ComponentId); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "allRequestParams", runtime.ParamLocationQuery, params.AllRequestParams); err != nil {
+			return nil, err
+		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+			return nil, err
+		} else {
+			for k, v := range parsed {
+				for _, v2 := range v {
+					queryValues.Add(k, v2)
+				}
+			}
+		}
+
+		queryURL.RawQuery = queryValues.Encode()
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
@@ -1812,10 +1959,10 @@ type ClientWithResponsesInterface interface {
 	// ListAllCommandWithResponse request
 	ListAllCommandWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllCommandResponse, error)
 
-	// CreateCommandWithBodyWithResponse request with any body
-	CreateCommandWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCommandResponse, error)
+	// CreateNewCommandWithBodyWithResponse request with any body
+	CreateNewCommandWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNewCommandResponse, error)
 
-	CreateCommandWithResponse(ctx context.Context, body CreateCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCommandResponse, error)
+	CreateNewCommandWithResponse(ctx context.Context, body CreateNewCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNewCommandResponse, error)
 
 	// DeleteCommandByIdWithResponse request
 	DeleteCommandByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteCommandByIdResponse, error)
@@ -1831,27 +1978,33 @@ type ClientWithResponsesInterface interface {
 	// ListAllComponentWithResponse request
 	ListAllComponentWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*ListAllComponentResponse, error)
 
-	// CreateWithBodyWithResponse request with any body
-	CreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	// CreateNewComponentWithBodyWithResponse request with any body
+	CreateNewComponentWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNewComponentResponse, error)
 
-	CreateWithResponse(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	CreateNewComponentWithResponse(ctx context.Context, body CreateNewComponentJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNewComponentResponse, error)
 
-	// DeleteByIdWithResponse request
-	DeleteByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteByIdResponse, error)
+	// DeleteComponentByIdWithResponse request
+	DeleteComponentByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteComponentByIdResponse, error)
 
-	// FindByIdWithResponse request
-	FindByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindByIdResponse, error)
+	// FindComponentByIdWithResponse request
+	FindComponentByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindComponentByIdResponse, error)
 
-	// UpdateByIdWithBodyWithResponse request with any body
-	UpdateByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error)
+	// UpdateComponentByIdWithBodyWithResponse request with any body
+	UpdateComponentByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateComponentByIdResponse, error)
 
-	UpdateByIdWithResponse(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error)
+	UpdateComponentByIdWithResponse(ctx context.Context, id string, body UpdateComponentByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateComponentByIdResponse, error)
 
 	// DeleteAllWithResponse request
 	DeleteAllWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*DeleteAllResponse, error)
 
 	// EchoWithResponse request
 	EchoWithResponse(ctx context.Context, value string, reqEditors ...RequestEditorFn) (*EchoResponse, error)
+
+	// FindAllEngineNamesWithResponse request
+	FindAllEngineNamesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*FindAllEngineNamesResponse, error)
+
+	// GenerateComponentArtifactWithResponse request
+	GenerateComponentArtifactWithResponse(ctx context.Context, params *GenerateComponentArtifactParams, reqEditors ...RequestEditorFn) (*GenerateComponentArtifactResponse, error)
 
 	// GetMockUserWithResponse request
 	GetMockUserWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetMockUserResponse, error)
@@ -2077,14 +2230,14 @@ func (r ListAllCommandResponse) StatusCode() int {
 	return 0
 }
 
-type CreateCommandResponse struct {
+type CreateNewCommandResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ApiResultResponseString
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateCommandResponse) Status() string {
+func (r CreateNewCommandResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2092,7 +2245,7 @@ func (r CreateCommandResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateCommandResponse) StatusCode() int {
+func (r CreateNewCommandResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2187,14 +2340,14 @@ func (r ListAllComponentResponse) StatusCode() int {
 	return 0
 }
 
-type CreateResponse struct {
+type CreateNewComponentResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ApiResultResponseString
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateResponse) Status() string {
+func (r CreateNewComponentResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2202,21 +2355,21 @@ func (r CreateResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateResponse) StatusCode() int {
+func (r CreateNewComponentResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteByIdResponse struct {
+type DeleteComponentByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ApiResultResponseBoolean
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteByIdResponse) Status() string {
+func (r DeleteComponentByIdResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2224,21 +2377,21 @@ func (r DeleteByIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteByIdResponse) StatusCode() int {
+func (r DeleteComponentByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type FindByIdResponse struct {
+type FindComponentByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ApiResultResponseComponentDTO
 }
 
 // Status returns HTTPResponse.Status
-func (r FindByIdResponse) Status() string {
+func (r FindComponentByIdResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2246,21 +2399,21 @@ func (r FindByIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r FindByIdResponse) StatusCode() int {
+func (r FindComponentByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type UpdateByIdResponse struct {
+type UpdateComponentByIdResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ApiResultResponseBoolean
 }
 
 // Status returns HTTPResponse.Status
-func (r UpdateByIdResponse) Status() string {
+func (r UpdateComponentByIdResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2268,7 +2421,7 @@ func (r UpdateByIdResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r UpdateByIdResponse) StatusCode() int {
+func (r UpdateComponentByIdResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2313,6 +2466,50 @@ func (r EchoResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r EchoResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type FindAllEngineNamesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ApiResultResponseSetString
+}
+
+// Status returns HTTPResponse.Status
+func (r FindAllEngineNamesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r FindAllEngineNamesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GenerateComponentArtifactResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *openapi_types.File
+}
+
+// Status returns HTTPResponse.Status
+func (r GenerateComponentArtifactResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GenerateComponentArtifactResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2439,21 +2636,21 @@ func (c *ClientWithResponses) ListAllCommandWithResponse(ctx context.Context, re
 	return ParseListAllCommandResponse(rsp)
 }
 
-// CreateCommandWithBodyWithResponse request with arbitrary body returning *CreateCommandResponse
-func (c *ClientWithResponses) CreateCommandWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCommandResponse, error) {
-	rsp, err := c.CreateCommandWithBody(ctx, contentType, body, reqEditors...)
+// CreateNewCommandWithBodyWithResponse request with arbitrary body returning *CreateNewCommandResponse
+func (c *ClientWithResponses) CreateNewCommandWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNewCommandResponse, error) {
+	rsp, err := c.CreateNewCommandWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateCommandResponse(rsp)
+	return ParseCreateNewCommandResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateCommandWithResponse(ctx context.Context, body CreateCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCommandResponse, error) {
-	rsp, err := c.CreateCommand(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateNewCommandWithResponse(ctx context.Context, body CreateNewCommandJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNewCommandResponse, error) {
+	rsp, err := c.CreateNewCommand(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateCommandResponse(rsp)
+	return ParseCreateNewCommandResponse(rsp)
 }
 
 // DeleteCommandByIdWithResponse request returning *DeleteCommandByIdResponse
@@ -2500,56 +2697,56 @@ func (c *ClientWithResponses) ListAllComponentWithResponse(ctx context.Context, 
 	return ParseListAllComponentResponse(rsp)
 }
 
-// CreateWithBodyWithResponse request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.CreateWithBody(ctx, contentType, body, reqEditors...)
+// CreateNewComponentWithBodyWithResponse request with arbitrary body returning *CreateNewComponentResponse
+func (c *ClientWithResponses) CreateNewComponentWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateNewComponentResponse, error) {
+	rsp, err := c.CreateNewComponentWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateResponse(rsp)
+	return ParseCreateNewComponentResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.Create(ctx, body, reqEditors...)
+func (c *ClientWithResponses) CreateNewComponentWithResponse(ctx context.Context, body CreateNewComponentJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateNewComponentResponse, error) {
+	rsp, err := c.CreateNewComponent(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseCreateResponse(rsp)
+	return ParseCreateNewComponentResponse(rsp)
 }
 
-// DeleteByIdWithResponse request returning *DeleteByIdResponse
-func (c *ClientWithResponses) DeleteByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteByIdResponse, error) {
-	rsp, err := c.DeleteById(ctx, id, reqEditors...)
+// DeleteComponentByIdWithResponse request returning *DeleteComponentByIdResponse
+func (c *ClientWithResponses) DeleteComponentByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*DeleteComponentByIdResponse, error) {
+	rsp, err := c.DeleteComponentById(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseDeleteByIdResponse(rsp)
+	return ParseDeleteComponentByIdResponse(rsp)
 }
 
-// FindByIdWithResponse request returning *FindByIdResponse
-func (c *ClientWithResponses) FindByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindByIdResponse, error) {
-	rsp, err := c.FindById(ctx, id, reqEditors...)
+// FindComponentByIdWithResponse request returning *FindComponentByIdResponse
+func (c *ClientWithResponses) FindComponentByIdWithResponse(ctx context.Context, id string, reqEditors ...RequestEditorFn) (*FindComponentByIdResponse, error) {
+	rsp, err := c.FindComponentById(ctx, id, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseFindByIdResponse(rsp)
+	return ParseFindComponentByIdResponse(rsp)
 }
 
-// UpdateByIdWithBodyWithResponse request with arbitrary body returning *UpdateByIdResponse
-func (c *ClientWithResponses) UpdateByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error) {
-	rsp, err := c.UpdateByIdWithBody(ctx, id, contentType, body, reqEditors...)
+// UpdateComponentByIdWithBodyWithResponse request with arbitrary body returning *UpdateComponentByIdResponse
+func (c *ClientWithResponses) UpdateComponentByIdWithBodyWithResponse(ctx context.Context, id string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateComponentByIdResponse, error) {
+	rsp, err := c.UpdateComponentByIdWithBody(ctx, id, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseUpdateByIdResponse(rsp)
+	return ParseUpdateComponentByIdResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateByIdWithResponse(ctx context.Context, id string, body UpdateByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateByIdResponse, error) {
-	rsp, err := c.UpdateById(ctx, id, body, reqEditors...)
+func (c *ClientWithResponses) UpdateComponentByIdWithResponse(ctx context.Context, id string, body UpdateComponentByIdJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateComponentByIdResponse, error) {
+	rsp, err := c.UpdateComponentById(ctx, id, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseUpdateByIdResponse(rsp)
+	return ParseUpdateComponentByIdResponse(rsp)
 }
 
 // DeleteAllWithResponse request returning *DeleteAllResponse
@@ -2568,6 +2765,24 @@ func (c *ClientWithResponses) EchoWithResponse(ctx context.Context, value string
 		return nil, err
 	}
 	return ParseEchoResponse(rsp)
+}
+
+// FindAllEngineNamesWithResponse request returning *FindAllEngineNamesResponse
+func (c *ClientWithResponses) FindAllEngineNamesWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*FindAllEngineNamesResponse, error) {
+	rsp, err := c.FindAllEngineNames(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseFindAllEngineNamesResponse(rsp)
+}
+
+// GenerateComponentArtifactWithResponse request returning *GenerateComponentArtifactResponse
+func (c *ClientWithResponses) GenerateComponentArtifactWithResponse(ctx context.Context, params *GenerateComponentArtifactParams, reqEditors ...RequestEditorFn) (*GenerateComponentArtifactResponse, error) {
+	rsp, err := c.GenerateComponentArtifact(ctx, params, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGenerateComponentArtifactResponse(rsp)
 }
 
 // GetMockUserWithResponse request returning *GetMockUserResponse
@@ -2839,15 +3054,15 @@ func ParseListAllCommandResponse(rsp *http.Response) (*ListAllCommandResponse, e
 	return response, nil
 }
 
-// ParseCreateCommandResponse parses an HTTP response from a CreateCommandWithResponse call
-func ParseCreateCommandResponse(rsp *http.Response) (*CreateCommandResponse, error) {
+// ParseCreateNewCommandResponse parses an HTTP response from a CreateNewCommandWithResponse call
+func ParseCreateNewCommandResponse(rsp *http.Response) (*CreateNewCommandResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateCommandResponse{
+	response := &CreateNewCommandResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2969,15 +3184,15 @@ func ParseListAllComponentResponse(rsp *http.Response) (*ListAllComponentRespons
 	return response, nil
 }
 
-// ParseCreateResponse parses an HTTP response from a CreateWithResponse call
-func ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
+// ParseCreateNewComponentResponse parses an HTTP response from a CreateNewComponentWithResponse call
+func ParseCreateNewComponentResponse(rsp *http.Response) (*CreateNewComponentResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateResponse{
+	response := &CreateNewComponentResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2995,15 +3210,15 @@ func ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	return response, nil
 }
 
-// ParseDeleteByIdResponse parses an HTTP response from a DeleteByIdWithResponse call
-func ParseDeleteByIdResponse(rsp *http.Response) (*DeleteByIdResponse, error) {
+// ParseDeleteComponentByIdResponse parses an HTTP response from a DeleteComponentByIdWithResponse call
+func ParseDeleteComponentByIdResponse(rsp *http.Response) (*DeleteComponentByIdResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteByIdResponse{
+	response := &DeleteComponentByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3021,15 +3236,15 @@ func ParseDeleteByIdResponse(rsp *http.Response) (*DeleteByIdResponse, error) {
 	return response, nil
 }
 
-// ParseFindByIdResponse parses an HTTP response from a FindByIdWithResponse call
-func ParseFindByIdResponse(rsp *http.Response) (*FindByIdResponse, error) {
+// ParseFindComponentByIdResponse parses an HTTP response from a FindComponentByIdWithResponse call
+func ParseFindComponentByIdResponse(rsp *http.Response) (*FindComponentByIdResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &FindByIdResponse{
+	response := &FindComponentByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3047,15 +3262,15 @@ func ParseFindByIdResponse(rsp *http.Response) (*FindByIdResponse, error) {
 	return response, nil
 }
 
-// ParseUpdateByIdResponse parses an HTTP response from a UpdateByIdWithResponse call
-func ParseUpdateByIdResponse(rsp *http.Response) (*UpdateByIdResponse, error) {
+// ParseUpdateComponentByIdResponse parses an HTTP response from a UpdateComponentByIdWithResponse call
+func ParseUpdateComponentByIdResponse(rsp *http.Response) (*UpdateComponentByIdResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &UpdateByIdResponse{
+	response := &UpdateComponentByIdResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3115,6 +3330,58 @@ func ParseEchoResponse(rsp *http.Response) (*EchoResponse, error) {
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest ApiResultResponseString
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseFindAllEngineNamesResponse parses an HTTP response from a FindAllEngineNamesWithResponse call
+func ParseFindAllEngineNamesResponse(rsp *http.Response) (*FindAllEngineNamesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &FindAllEngineNamesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ApiResultResponseSetString
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGenerateComponentArtifactResponse parses an HTTP response from a GenerateComponentArtifactWithResponse call
+func ParseGenerateComponentArtifactResponse(rsp *http.Response) (*GenerateComponentArtifactResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GenerateComponentArtifactResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest openapi_types.File
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -3185,7 +3452,7 @@ type ServerInterface interface {
 	ListAllCommand(ctx echo.Context) error
 	// Create a new component
 	// (POST /v1/command)
-	CreateCommand(ctx echo.Context) error
+	CreateNewCommand(ctx echo.Context) error
 	// Return a command template by its unique identifier
 	// (DELETE /v1/command/{id})
 	DeleteCommandById(ctx echo.Context, id string) error
@@ -3200,22 +3467,28 @@ type ServerInterface interface {
 	ListAllComponent(ctx echo.Context) error
 	// Create a new component
 	// (POST /v1/component)
-	Create(ctx echo.Context) error
+	CreateNewComponent(ctx echo.Context) error
 	// Delete a component by his id
 	// (DELETE /v1/component/{id})
-	DeleteById(ctx echo.Context, id string) error
+	DeleteComponentById(ctx echo.Context, id string) error
 	// Find a component by an id
 	// (GET /v1/component/{id})
-	FindById(ctx echo.Context, id string) error
+	FindComponentById(ctx echo.Context, id string) error
 	// Delete a component by his id
 	// (PUT /v1/component/{id})
-	UpdateById(ctx echo.Context, id string) error
+	UpdateComponentById(ctx echo.Context, id string) error
 	// Reset all the data
 	// (POST /v1/debug)
 	DeleteAll(ctx echo.Context) error
 	// Example api that realize an ECHO
 	// (GET /v1/echo/test/{value})
 	Echo(ctx echo.Context, value string) error
+	// Return all engine name
+	// (GET /v1/engine/all)
+	FindAllEngineNames(ctx echo.Context) error
+	// Generate component artifact using a specific engine
+	// (GET /v1/engine/generate)
+	GenerateComponentArtifact(ctx echo.Context, params GenerateComponentArtifactParams) error
 
 	// (GET /v1/mock/users-auth)
 	GetMockUser(ctx echo.Context) error
@@ -3355,12 +3628,12 @@ func (w *ServerInterfaceWrapper) ListAllCommand(ctx echo.Context) error {
 	return err
 }
 
-// CreateCommand converts echo context to params.
-func (w *ServerInterfaceWrapper) CreateCommand(ctx echo.Context) error {
+// CreateNewCommand converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateNewCommand(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.CreateCommand(ctx)
+	err = w.Handler.CreateNewCommand(ctx)
 	return err
 }
 
@@ -3421,17 +3694,17 @@ func (w *ServerInterfaceWrapper) ListAllComponent(ctx echo.Context) error {
 	return err
 }
 
-// Create converts echo context to params.
-func (w *ServerInterfaceWrapper) Create(ctx echo.Context) error {
+// CreateNewComponent converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateNewComponent(ctx echo.Context) error {
 	var err error
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.Create(ctx)
+	err = w.Handler.CreateNewComponent(ctx)
 	return err
 }
 
-// DeleteById converts echo context to params.
-func (w *ServerInterfaceWrapper) DeleteById(ctx echo.Context) error {
+// DeleteComponentById converts echo context to params.
+func (w *ServerInterfaceWrapper) DeleteComponentById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id string
@@ -3442,12 +3715,12 @@ func (w *ServerInterfaceWrapper) DeleteById(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.DeleteById(ctx, id)
+	err = w.Handler.DeleteComponentById(ctx, id)
 	return err
 }
 
-// FindById converts echo context to params.
-func (w *ServerInterfaceWrapper) FindById(ctx echo.Context) error {
+// FindComponentById converts echo context to params.
+func (w *ServerInterfaceWrapper) FindComponentById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id string
@@ -3458,12 +3731,12 @@ func (w *ServerInterfaceWrapper) FindById(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.FindById(ctx, id)
+	err = w.Handler.FindComponentById(ctx, id)
 	return err
 }
 
-// UpdateById converts echo context to params.
-func (w *ServerInterfaceWrapper) UpdateById(ctx echo.Context) error {
+// UpdateComponentById converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateComponentById(ctx echo.Context) error {
 	var err error
 	// ------------- Path parameter "id" -------------
 	var id string
@@ -3474,7 +3747,7 @@ func (w *ServerInterfaceWrapper) UpdateById(ctx echo.Context) error {
 	}
 
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.UpdateById(ctx, id)
+	err = w.Handler.UpdateComponentById(ctx, id)
 	return err
 }
 
@@ -3500,6 +3773,47 @@ func (w *ServerInterfaceWrapper) Echo(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.Echo(ctx, value)
+	return err
+}
+
+// FindAllEngineNames converts echo context to params.
+func (w *ServerInterfaceWrapper) FindAllEngineNames(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.FindAllEngineNames(ctx)
+	return err
+}
+
+// GenerateComponentArtifact converts echo context to params.
+func (w *ServerInterfaceWrapper) GenerateComponentArtifact(ctx echo.Context) error {
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GenerateComponentArtifactParams
+	// ------------- Required query parameter "engineName" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "engineName", ctx.QueryParams(), &params.EngineName)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter engineName: %s", err))
+	}
+
+	// ------------- Required query parameter "componentId" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "componentId", ctx.QueryParams(), &params.ComponentId)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter componentId: %s", err))
+	}
+
+	// ------------- Required query parameter "allRequestParams" -------------
+
+	err = runtime.BindQueryParameter("form", true, true, "allRequestParams", ctx.QueryParams(), &params.AllRequestParams)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter allRequestParams: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GenerateComponentArtifact(ctx, params)
 	return err
 }
 
@@ -3550,17 +3864,19 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/v1/auth/root/:email", wrapper.SetRootUser)
 	router.GET(baseURL+"/v1/auth/users", wrapper.FindPeople)
 	router.GET(baseURL+"/v1/command", wrapper.ListAllCommand)
-	router.POST(baseURL+"/v1/command", wrapper.CreateCommand)
+	router.POST(baseURL+"/v1/command", wrapper.CreateNewCommand)
 	router.DELETE(baseURL+"/v1/command/:id", wrapper.DeleteCommandById)
 	router.GET(baseURL+"/v1/command/:id", wrapper.FindCommandById)
 	router.PUT(baseURL+"/v1/command/:id", wrapper.UpdateCommandById)
 	router.GET(baseURL+"/v1/component", wrapper.ListAllComponent)
-	router.POST(baseURL+"/v1/component", wrapper.Create)
-	router.DELETE(baseURL+"/v1/component/:id", wrapper.DeleteById)
-	router.GET(baseURL+"/v1/component/:id", wrapper.FindById)
-	router.PUT(baseURL+"/v1/component/:id", wrapper.UpdateById)
+	router.POST(baseURL+"/v1/component", wrapper.CreateNewComponent)
+	router.DELETE(baseURL+"/v1/component/:id", wrapper.DeleteComponentById)
+	router.GET(baseURL+"/v1/component/:id", wrapper.FindComponentById)
+	router.PUT(baseURL+"/v1/component/:id", wrapper.UpdateComponentById)
 	router.POST(baseURL+"/v1/debug", wrapper.DeleteAll)
 	router.GET(baseURL+"/v1/echo/test/:value", wrapper.Echo)
+	router.GET(baseURL+"/v1/engine/all", wrapper.FindAllEngineNames)
+	router.GET(baseURL+"/v1/engine/generate", wrapper.GenerateComponentArtifact)
 	router.GET(baseURL+"/v1/mock/users-auth", wrapper.GetMockUser)
 
 }
@@ -3568,49 +3884,53 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"ljfL/wUAAP//HL649khiAAA=",
+	"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",
+	"JLdasV2tnq4Bx7+4XfwvAAD//4mLtn8vaQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
